@@ -206,16 +206,6 @@
       .rgb-button.primary { --button-bg: #b7ff65; color: #10150d; font-weight: 700; }
       .button-arrow { font-size: 16px; line-height: 1; }
 
-      [data-i18n], [data-nav] {
-        transition: opacity .28s ease, transform .28s ease;
-      }
-
-      body[data-language-changing="true"] [data-i18n],
-      body[data-language-changing="true"] [data-nav] {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-
       .hero-art {
         position: relative;
         width: min(100%, 490px);
@@ -578,7 +568,6 @@
       const githubProfile = "https://github.com/il1mated";
       const avatar = document.querySelector("#profile-avatar");
       const avatarPlaceholder = document.querySelector("#avatar-placeholder");
-      let languageTransitionTimeout;
 
       if (avatar) {
         avatar.addEventListener("error", () => {
@@ -590,10 +579,17 @@
       function setLanguage(language) {
         if (!translations[language] || language === state.language) return;
 
-        clearTimeout(languageTransitionTimeout);
         state.language = language;
         document.body.dataset.language = language;
-        document.body.dataset.languageChanging = "true";
+        document.documentElement.lang = language;
+
+        function updateText(element, value) {
+          element.innerHTML = value;
+          element.animate(
+            [{ opacity: 0.88 }, { opacity: 1 }],
+            { duration: 180, easing: "ease-out" }
+          );
+        }
 
         document.querySelectorAll(".lang-btn").forEach((button) => {
           const isActive = button.dataset.lang === language;
@@ -601,30 +597,24 @@
           button.setAttribute("aria-pressed", String(isActive));
         });
 
-        languageTransitionTimeout = setTimeout(() => {
-          document.documentElement.lang = language;
+        Object.entries(translations[language].nav).forEach(([key, value]) => {
+          const link = document.querySelector(`[data-nav="${key}"]`);
+          if (link) updateText(link, value);
+        });
 
-          Object.entries(translations[language].nav).forEach(([key, value]) => {
-            const link = document.querySelector(`[data-nav="${key}"]`);
-            if (link) link.textContent = value;
-          });
-
-          document.querySelectorAll("[data-i18n]").forEach((element) => {
-            const path = element.dataset.i18n.split(".");
-            let value = translations[language];
-            for (const part of path) {
-              value = value?.[part];
-            }
-            if (typeof value === "string") element.innerHTML = value;
-          });
-
-          const currentProjectFallback = projectGrid.querySelector(".projects-state");
-          if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
-            currentProjectFallback.innerHTML = `${translations[language].projects.empty} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${translations[language].projects.emptyLink}</a>`;
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const path = element.dataset.i18n.split(".");
+          let value = translations[language];
+          for (const part of path) {
+            value = value?.[part];
           }
+          if (typeof value === "string") updateText(element, value);
+        });
 
-          document.body.dataset.languageChanging = "false";
-        }, 150);
+        const currentProjectFallback = projectGrid.querySelector(".projects-state");
+        if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
+          updateText(currentProjectFallback, `${translations[language].projects.empty} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${translations[language].projects.emptyLink}</a>`);
+        }
       }
 
       function showProjectFallback(messageKey) {
