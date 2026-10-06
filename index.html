@@ -74,17 +74,35 @@
       }
 
       .lang-switch {
+        position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 5px;
+        gap: 3px;
+        padding: 4px;
         border: 1px solid rgba(255,255,255,.08);
         border-radius: 999px;
         background: rgba(16,20,22,.7);
       }
 
+      .lang-switch::before {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 42px;
+        height: 30px;
+        border-radius: 999px;
+        background: var(--mint);
+        content: "";
+        transition: transform .38s cubic-bezier(.22,.8,.25,1);
+      }
+
+      body[data-language="en"] .lang-switch::before { transform: translateX(45px); }
+
       .lang-btn {
-        min-width: 40px;
+        position: relative;
+        z-index: 1;
+        width: 42px;
+        height: 30px;
         border: 0;
         border-radius: 999px;
         background: transparent;
@@ -93,14 +111,16 @@
         letter-spacing: .08em;
         text-transform: uppercase;
         cursor: pointer;
-        transition: background .2s ease, color .2s ease;
+        transition: color .28s ease, transform .28s ease;
       }
 
       .lang-btn.is-active {
-        background: var(--mint);
         color: #10150d;
         font-weight: 700;
       }
+
+      .lang-btn:hover { transform: scale(1.06); }
+      .lang-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
       .availability {
         display: inline-flex;
@@ -153,36 +173,48 @@
         background: var(--button-bg);
         color: var(--ink);
         font: 13px var(--sans);
-        transition: box-shadow .3s ease, transform .3s ease;
+        transition: box-shadow .38s ease, transform .38s cubic-bezier(.2,.75,.25,1), border-color .38s ease;
       }
 
       .rgb-button::before {
         position: absolute;
         z-index: -1;
-        inset: -7px;
-        padding: 10px;
-        border-radius: 14px;
-        background: conic-gradient(from var(--turn), transparent 0deg 255deg, #ff68b7 282deg, #67e9ee 310deg, #b7ff65 337deg, transparent 360deg);
+        inset: -3px;
+        padding: 5px;
+        border-radius: 10px;
+        background: conic-gradient(from var(--turn), transparent 0deg 255deg, #ff68b7 278deg, #67e9ee 306deg, #b7ff65 334deg, transparent 360deg);
         content: "";
-        filter: blur(10px);
+        filter: blur(5px);
         opacity: 0;
         pointer-events: none;
         -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
         -webkit-mask-composite: xor;
         mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
         mask-composite: exclude;
-        transition: opacity .25s ease;
+        transition: opacity .42s ease;
       }
 
       .rgb-button:hover, .rgb-button:focus-visible {
-        box-shadow: 0 0 28px rgba(103,233,238,.12), 0 0 42px rgba(255,104,183,.1);
+        border-color: rgba(183,255,101,.72);
+        box-shadow: 0 0 18px rgba(103,233,238,.2), 0 0 30px rgba(255,104,183,.16);
         transform: translateY(-2px);
       }
 
-      .rgb-button:hover::before, .rgb-button:focus-visible::before { opacity: .9; animation: rgb-turn 1.8s linear infinite; }
+      .rgb-button:hover::before, .rgb-button:focus-visible::before { opacity: 1; animation: rgb-turn 1.8s linear infinite; }
+      .rgb-button:active { transform: translateY(0); }
       .rgb-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; }
       .rgb-button.primary { --button-bg: #b7ff65; color: #10150d; font-weight: 700; }
       .button-arrow { font-size: 16px; line-height: 1; }
+
+      [data-i18n], [data-nav] {
+        transition: opacity .28s ease, transform .28s ease;
+      }
+
+      body[data-language-changing="true"] [data-i18n],
+      body[data-language-changing="true"] [data-nav] {
+        opacity: 0;
+        transform: translateY(4px);
+      }
 
       .hero-art {
         position: relative;
@@ -546,6 +578,7 @@
       const githubProfile = "https://github.com/il1mated";
       const avatar = document.querySelector("#profile-avatar");
       const avatarPlaceholder = document.querySelector("#avatar-placeholder");
+      let languageTransitionTimeout;
 
       if (avatar) {
         avatar.addEventListener("error", () => {
@@ -555,23 +588,12 @@
       }
 
       function setLanguage(language) {
+        if (!translations[language] || language === state.language) return;
+
+        clearTimeout(languageTransitionTimeout);
         state.language = language;
         document.body.dataset.language = language;
-        document.documentElement.lang = language === "en" ? "en" : "ru";
-
-        Object.entries(translations[language].nav).forEach(([key, value]) => {
-          const link = document.querySelector(`[data-nav="${key}"]`);
-          if (link) link.textContent = value;
-        });
-
-        document.querySelectorAll("[data-i18n]").forEach((element) => {
-          const path = element.dataset.i18n.split(".");
-          let value = translations[language];
-          for (const part of path) {
-            value = value?.[part];
-          }
-          if (typeof value === "string") element.innerHTML = value;
-        });
+        document.body.dataset.languageChanging = "true";
 
         document.querySelectorAll(".lang-btn").forEach((button) => {
           const isActive = button.dataset.lang === language;
@@ -579,10 +601,30 @@
           button.setAttribute("aria-pressed", String(isActive));
         });
 
-        const currentProjectFallback = projectGrid.querySelector(".projects-state");
-        if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
-          currentProjectFallback.innerHTML = `${translations[language].projects.empty} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${translations[language].projects.emptyLink}</a>`;
-        }
+        languageTransitionTimeout = setTimeout(() => {
+          document.documentElement.lang = language;
+
+          Object.entries(translations[language].nav).forEach(([key, value]) => {
+            const link = document.querySelector(`[data-nav="${key}"]`);
+            if (link) link.textContent = value;
+          });
+
+          document.querySelectorAll("[data-i18n]").forEach((element) => {
+            const path = element.dataset.i18n.split(".");
+            let value = translations[language];
+            for (const part of path) {
+              value = value?.[part];
+            }
+            if (typeof value === "string") element.innerHTML = value;
+          });
+
+          const currentProjectFallback = projectGrid.querySelector(".projects-state");
+          if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
+            currentProjectFallback.innerHTML = `${translations[language].projects.empty} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${translations[language].projects.emptyLink}</a>`;
+          }
+
+          document.body.dataset.languageChanging = "false";
+        }, 150);
       }
 
       function showProjectFallback(messageKey) {
