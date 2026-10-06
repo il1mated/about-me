@@ -79,6 +79,8 @@
         align-items: center;
         gap: 3px;
         padding: 4px;
+        touch-action: pan-y;
+        user-select: none;
         border: 1px solid rgba(255,255,255,.08);
         border-radius: 999px;
         background: rgba(16,20,22,.7);
@@ -93,10 +95,9 @@
         border-radius: 999px;
         background: var(--mint);
         content: "";
+        transform: translateX(var(--lang-offset, 0px));
         transition: transform .38s cubic-bezier(.22,.8,.25,1);
       }
-
-      body[data-language="en"] .lang-switch::before { transform: translateX(45px); }
 
       .lang-btn {
         position: relative;
@@ -191,6 +192,7 @@
         -webkit-mask-composite: xor;
         mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
         mask-composite: exclude;
+        animation: rgb-turn 1.8s linear infinite paused;
         transition: opacity .42s ease;
       }
 
@@ -200,7 +202,7 @@
         transform: translateY(-2px);
       }
 
-      .rgb-button:hover::before, .rgb-button:focus-visible::before { opacity: 1; animation: rgb-turn 1.8s linear infinite; }
+      .rgb-button:hover::before, .rgb-button:focus-visible::before { opacity: 1; animation-play-state: running; }
       .rgb-button:active { transform: translateY(0); }
       .rgb-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; }
       .rgb-button.primary { --button-bg: #b7ff65; color: #10150d; font-weight: 700; }
@@ -396,7 +398,7 @@
       </nav>
 
       <div class="topbar-right">
-        <div class="lang-switch" aria-label="Выбор языка">
+        <div class="lang-switch" role="group" aria-label="Выбор языка">
           <button class="lang-btn is-active" type="button" data-lang="ru" aria-pressed="true">RU</button>
           <button class="lang-btn" type="button" data-lang="en" aria-pressed="false">EN</button>
         </div>
@@ -568,6 +570,19 @@
       const githubProfile = "https://github.com/il1mated";
       const avatar = document.querySelector("#profile-avatar");
       const avatarPlaceholder = document.querySelector("#avatar-placeholder");
+      const langSwitch = document.querySelector(".lang-switch");
+      const languageButtons = [...document.querySelectorAll(".lang-btn")];
+
+      function updateLanguageSlider(language) {
+        const baseButton = languageButtons[0];
+        const activeButton = languageButtons.find((button) => button.dataset.lang === language);
+        langSwitch.style.setProperty("--lang-offset", `${activeButton.offsetLeft - baseButton.offsetLeft}px`);
+      }
+
+      function selectLanguageAt(clientX) {
+        const bounds = langSwitch.getBoundingClientRect();
+        setLanguage(clientX < bounds.left + bounds.width / 2 ? "ru" : "en");
+      }
 
       if (avatar) {
         avatar.addEventListener("error", () => {
@@ -582,12 +597,14 @@
         state.language = language;
         document.body.dataset.language = language;
         document.documentElement.lang = language;
+        updateLanguageSlider(language);
 
         function updateText(element, value) {
           element.innerHTML = value;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
           element.animate(
-            [{ opacity: 0.88 }, { opacity: 1 }],
-            { duration: 180, easing: "ease-out" }
+            [{ opacity: 0.35 }, { opacity: 1 }],
+            { duration: 260, easing: "cubic-bezier(.2,.75,.25,1)" }
           );
         }
 
@@ -666,6 +683,29 @@
           setLanguage(button.dataset.lang);
         });
       });
+
+      let activeLanguagePointer = null;
+
+      langSwitch.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        activeLanguagePointer = event.pointerId;
+        langSwitch.setPointerCapture(event.pointerId);
+        langSwitch.dataset.dragging = "true";
+        selectLanguageAt(event.clientX);
+      });
+
+      langSwitch.addEventListener("pointermove", (event) => {
+        if (event.pointerId === activeLanguagePointer) selectLanguageAt(event.clientX);
+      });
+
+      function finishLanguageDrag(event) {
+        if (event.pointerId !== activeLanguagePointer) return;
+        activeLanguagePointer = null;
+        delete langSwitch.dataset.dragging;
+      }
+
+      langSwitch.addEventListener("pointerup", finishLanguageDrag);
+      langSwitch.addEventListener("pointercancel", finishLanguageDrag);
 
       setLanguage("ru");
 
