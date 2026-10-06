@@ -67,6 +67,41 @@
       .nav a { transition: color .2s ease; }
       .nav a:hover { color: var(--mint); }
 
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .lang-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 999px;
+        background: rgba(16,20,22,.7);
+      }
+
+      .lang-btn {
+        min-width: 40px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: #bfc9c3;
+        font: 12px var(--mono);
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+      }
+
+      .lang-btn.is-active {
+        background: var(--mint);
+        color: #10150d;
+        font-weight: 700;
+      }
+
       .availability {
         display: inline-flex;
         align-items: center;
@@ -325,29 +360,37 @@
       }
     </style>
   </head>
-  <body>
+  <body data-language="ru">
     <header class="shell topbar">
       <a class="wordmark" href="#top" aria-label="ilimated, начало страницы">
         <span class="wordmark-mark">//</span>
         <span class="wordmark-name">ilimated</span>
       </a>
+
       <nav class="nav" aria-label="Основная навигация">
-        <a href="#about">About me</a>
-        <a href="#projects">Проекты</a>
-        <a href="#contact">Контакты</a>
+        <a href="#about" data-nav="about">Обо мне</a>
+        <a href="#projects" data-nav="projects">Проекты</a>
+        <a href="#contact" data-nav="contact">Контакты</a>
       </nav>
-      <span class="availability">Python · Web</span>
+
+      <div class="topbar-right">
+        <div class="lang-switch" aria-label="Выбор языка">
+          <button class="lang-btn is-active" type="button" data-lang="ru" aria-pressed="true">RU</button>
+          <button class="lang-btn" type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <span class="availability">Python · Web</span>
+      </div>
     </header>
 
     <main id="top">
       <section class="shell hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <div class="eyebrow reveal">Разработка с характером</div>
-          <h1 id="hero-title" class="reveal delay-one">Привет,<br>я <span>ilimated.</span></h1>
-          <p class="reveal delay-two">Создаю на Python и для веба. Собираю идеи в работающие проекты — от первой строчки кода до последнего пикселя.</p>
+          <div class="eyebrow reveal" data-i18n="hero.eyebrow">Разработка с характером</div>
+          <h1 id="hero-title" class="reveal delay-one" data-i18n="hero.title">Привет,<br>я <span>ilimated.</span></h1>
+          <p class="reveal delay-two" data-i18n="hero.description">Создаю на Python и для веба. Собираю идеи в работающие проекты — от первой строчки кода до последнего пикселя.</p>
           <div class="hero-actions reveal delay-three">
-            <a class="rgb-button primary" href="#projects">Смотреть проекты <span class="button-arrow" aria-hidden="true">↘</span></a>
-            <a class="rgb-button" href="https://t.me/ilimated" target="_blank" rel="noopener noreferrer">Написать в Telegram <span class="button-arrow" aria-hidden="true">↗</span></a>
+            <a class="rgb-button primary" href="#projects" data-i18n="hero.primaryButton">Смотреть проекты <span class="button-arrow" aria-hidden="true">↘</span></a>
+            <a class="rgb-button" href="https://t.me/ilimated" target="_blank" rel="noopener noreferrer" data-i18n="hero.secondaryButton">Написать в Telegram <span class="button-arrow" aria-hidden="true">↗</span></a>
           </div>
         </div>
 
@@ -361,7 +404,7 @@
               <span id="avatar-placeholder" class="portrait-placeholder" aria-hidden="true">i.</span>
             </div>
           </div>
-          <div class="hero-index"><span>01</span> / PYTHON & WEB</div>
+          <div class="hero-index"><span>01</span> / PYTHON &amp; WEB</div>
         </div>
       </section>
 
@@ -369,15 +412,15 @@
         <div class="shell">
           <div class="section-heading">
             <div>
-              <div class="section-kicker">Коротко обо мне</div>
-              <h2 id="about-title">About me</h2>
+              <div class="section-kicker" data-i18n="about.kicker">Коротко обо мне</div>
+              <h2 id="about-title" data-i18n="about.title">Обо мне</h2>
             </div>
-            <p>Любопытство к технологиям превращаю в полезные вещи. Сейчас мой фокус — Python и веб-разработка.</p>
+            <p data-i18n="about.summary">Любопытство к технологиям превращаю в полезные вещи. Сейчас мой фокус — Python и веб-разработка.</p>
           </div>
           <div class="about-grid">
             <div class="about-copy">
-              <p>Меня зовут <strong>ilimated</strong>. Мне нравится разбираться, как устроены цифровые продукты, и делать их своими руками.</p>
-              <p>В коде ценю ясность, в интерфейсах — внимание к деталям. Изучаю инструменты, пробую новые подходы и складываю лучшие находки в проекты.</p>
+              <p data-i18n="about.text1">Меня зовут <strong>ilimated</strong>. Мне нравится разбираться, как устроены цифровые продукты, и делать их своими руками.</p>
+              <p data-i18n="about.text2">В коде ценю ясность, в интерфейсах — внимание к деталям. Изучаю инструменты, пробую новые подходы и складываю лучшие находки в проекты.</p>
             </div>
             <div class="skills" aria-label="Навыки">
               <div class="skill-row">
@@ -401,13 +444,13 @@
         <div class="shell">
           <div class="section-heading">
             <div>
-              <div class="section-kicker">Подборка из GitHub</div>
-              <h2 id="projects-title">Проекты</h2>
+              <div class="section-kicker" data-i18n="projects.kicker">Подборка из GitHub</div>
+              <h2 id="projects-title" data-i18n="projects.title">Проекты</h2>
             </div>
             <a class="rgb-button" href="https://github.com/il1mated" target="_blank" rel="noopener noreferrer">GitHub <span class="button-arrow" aria-hidden="true">↗</span></a>
           </div>
           <div class="project-grid" id="project-grid" aria-live="polite">
-            <div class="projects-state">Загружаю публичные репозитории…</div>
+            <div class="projects-state" data-i18n="projects.loading">Загружаю публичные репозитории…</div>
           </div>
         </div>
       </section>
@@ -416,8 +459,8 @@
     <footer class="shell" id="contact">
       <div class="contact">
         <div>
-          <div class="contact-label">На связи</div>
-          <div style="margin-top:8px;font-size:17px">Давайте сделаем что-нибудь классное.</div>
+          <div class="contact-label" data-i18n="contact.label">На связи</div>
+          <div style="margin-top:8px;font-size:17px" data-i18n="contact.message">Давайте сделаем что-нибудь классное.</div>
         </div>
         <div class="contact-links">
           <a class="rgb-button" href="https://t.me/ilimated" target="_blank" rel="noopener noreferrer">Telegram <span class="button-arrow" aria-hidden="true">↗</span></a>
@@ -425,23 +468,127 @@
           <a class="rgb-button" href="mailto:ilimatedz@gmail.com">Email <span class="button-arrow" aria-hidden="true">↗</span></a>
         </div>
       </div>
-      <div class="footer-note">© 2026 ilimated · Сделано с вниманием к деталям</div>
+      <div class="footer-note" data-i18n="footer.note">© 2026 ilimated · Сделано с вниманием к деталям</div>
     </footer>
 
     <script>
+      const translations = {
+        ru: {
+          nav: { about: "Обо мне", projects: "Проекты", contact: "Контакты" },
+          hero: {
+            eyebrow: "Разработка с характером",
+            title: "Привет,<br>я <span>ilimated.</span>",
+            description: "Создаю на Python и для веба. Собираю идеи в работающие проекты — от первой строчки кода до последнего пикселя.",
+            primaryButton: "Смотреть проекты <span class=\"button-arrow\" aria-hidden=\"true\">↘</span>",
+            secondaryButton: "Написать в Telegram <span class=\"button-arrow\" aria-hidden=\"true\">↗</span>"
+          },
+          about: {
+            kicker: "Коротко обо мне",
+            title: "Обо мне",
+            summary: "Любопытство к технологиям превращаю в полезные вещи. Сейчас мой фокус — Python и веб-разработка.",
+            text1: "Меня зовут <strong>ilimated</strong>. Мне нравится разбираться, как устроены цифровые продукты, и делать их своими руками.",
+            text2: "В коде ценю ясность, в интерфейсах — внимание к деталям. Изучаю инструменты, пробую новые подходы и складываю лучшие находки в проекты."
+          },
+          projects: {
+            kicker: "Подборка из GitHub",
+            title: "Проекты",
+            loading: "Загружаю публичные репозитории…",
+            empty: "Пока нет публичных проектов для показа.",
+            emptyLink: "Открыть профиль на GitHub ↗",
+            error: "Не удалось загрузить список автоматически.",
+            descriptionFallback: "Исходный код и подробности проекта на GitHub."
+          },
+          contact: {
+            label: "На связи",
+            message: "Давайте сделаем что-нибудь классное."
+          },
+          footer: {
+            note: "© 2026 ilimated · Сделано с вниманием к деталям"
+          }
+        },
+        en: {
+          nav: { about: "About me", projects: "Projects", contact: "Contact" },
+          hero: {
+            eyebrow: "Development with character",
+            title: "Hi,<br>I am <span>ilimated.</span>",
+            description: "Building with Python and web technologies. Turning ideas into working products — from the first line of code to the final pixel.",
+            primaryButton: "View projects <span class=\"button-arrow\" aria-hidden=\"true\">↘</span>",
+            secondaryButton: "Message on Telegram <span class=\"button-arrow\" aria-hidden=\"true\">↗</span>"
+          },
+          about: {
+            kicker: "A quick intro",
+            title: "About me",
+            summary: "I turn curiosity about technology into useful products. Right now my focus is Python and web development.",
+            text1: "My name is <strong>ilimated</strong>. I enjoy understanding how digital products work and building them by hand.",
+            text2: "I value clarity in code and attention to detail in interfaces. I explore tools, test new approaches, and turn useful ideas into projects."
+          },
+          projects: {
+            kicker: "Selected from GitHub",
+            title: "Projects",
+            loading: "Loading public repositories…",
+            empty: "There are no public projects to show yet.",
+            emptyLink: "Open GitHub profile ↗",
+            error: "Could not load the project list automatically.",
+            descriptionFallback: "Source code and project details are available on GitHub."
+          },
+          contact: {
+            label: "Get in touch",
+            message: "Let’s build something great together."
+          },
+          footer: {
+            note: "© 2026 ilimated · Built with attention to detail"
+          }
+        }
+      };
+
+      const state = { language: "ru" };
+      const projectGrid = document.querySelector("#project-grid");
+      const githubProfile = "https://github.com/il1mated";
       const avatar = document.querySelector("#profile-avatar");
       const avatarPlaceholder = document.querySelector("#avatar-placeholder");
 
-      avatar.addEventListener("error", () => {
-        avatar.remove();
-        avatarPlaceholder.style.display = "grid";
-      });
+      if (avatar) {
+        avatar.addEventListener("error", () => {
+          avatar.remove();
+          avatarPlaceholder.style.display = "grid";
+        });
+      }
 
-      const projectGrid = document.querySelector("#project-grid");
-      const githubProfile = "https://github.com/il1mated";
+      function setLanguage(language) {
+        state.language = language;
+        document.body.dataset.language = language;
+        document.documentElement.lang = language === "en" ? "en" : "ru";
 
-      function showProjectFallback(message) {
-        projectGrid.innerHTML = `<div class="projects-state">${message} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">Открыть профиль на GitHub ↗</a></div>`;
+        Object.entries(translations[language].nav).forEach(([key, value]) => {
+          const link = document.querySelector(`[data-nav="${key}"]`);
+          if (link) link.textContent = value;
+        });
+
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const path = element.dataset.i18n.split(".");
+          let value = translations[language];
+          for (const part of path) {
+            value = value?.[part];
+          }
+          if (typeof value === "string") element.innerHTML = value;
+        });
+
+        document.querySelectorAll(".lang-btn").forEach((button) => {
+          const isActive = button.dataset.lang === language;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        const currentProjectFallback = projectGrid.querySelector(".projects-state");
+        if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
+          currentProjectFallback.innerHTML = `${translations[language].projects.empty} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${translations[language].projects.emptyLink}</a>`;
+        }
+      }
+
+      function showProjectFallback(messageKey) {
+        const languageText = translations[state.language].projects;
+        const linkText = languageText.emptyLink;
+        projectGrid.innerHTML = `<div class="projects-state" data-lang-fallback="true">${languageText[messageKey]} <a href="${githubProfile}" target="_blank" rel="noopener noreferrer">${linkText}</a></div>`;
       }
 
       function renderProjects(repositories) {
@@ -451,7 +598,7 @@
           .slice(0, 3);
 
         if (!projects.length) {
-          showProjectFallback("Пока нет публичных проектов для показа.");
+          showProjectFallback("empty");
           return;
         }
 
@@ -476,11 +623,19 @@
           const title = document.createElement("h3");
           title.textContent = repository.name;
           const description = document.createElement("p");
-          description.textContent = repository.description || "Исходный код и подробности проекта на GitHub.";
+          description.textContent = repository.description || translations[state.language].projects.descriptionFallback;
           card.append(top, title, description);
           return card;
         }));
       }
+
+      document.querySelectorAll(".lang-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          setLanguage(button.dataset.lang);
+        });
+      });
+
+      setLanguage("ru");
 
       fetch("https://api.github.com/users/il1mated/repos?sort=updated&per_page=30", {
         headers: { Accept: "application/vnd.github+json" }
@@ -490,7 +645,7 @@
           return response.json();
         })
         .then(renderProjects)
-        .catch(() => showProjectFallback("Не удалось загрузить список автоматически."));
+        .catch(() => showProjectFallback("error"));
     </script>
   </body>
 </html>
