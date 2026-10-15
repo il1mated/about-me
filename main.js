@@ -15,6 +15,11 @@ const translations = {
             text1: "Меня зовут <strong>ilimated</strong>. Мне нравится разбираться, как устроены цифровые продукты, и делать их своими руками.",
             text2: "В коде ценю ясность, в интерфейсах — внимание к деталям. Изучаю инструменты, пробую новые подходы и складываю лучшие находки в проекты."
         },
+        music: {
+            kicker: "// ПЛЕЙЛИСТ",
+            title: "Что я слушаю, пока пишу код",
+            embedTitle: "Плейлист ilimated на Spotify"
+        },
         projects: {
             kicker: "Подборка из GitHub",
             title: "Проекты",
@@ -48,6 +53,11 @@ const translations = {
             text1: "My name is <strong>ilimated</strong>. I enjoy understanding how digital products work and building them by hand.",
             text2: "I value clarity in code and attention to detail in interfaces. I explore tools, test new approaches, and turn useful ideas into projects."
         },
+        music: {
+            kicker: "// PLAYLIST",
+            title: "What I listen to while coding",
+            embedTitle: "ilimated's Spotify playlist"
+        },
         projects: {
             kicker: "Selected from GitHub",
             title: "Projects",
@@ -74,6 +84,31 @@ const avatar = document.querySelector("#profile-avatar");
 const avatarPlaceholder = document.querySelector("#avatar-placeholder");
 const langSwitch = document.querySelector(".lang-switch");
 const languageButtons = [...document.querySelectorAll(".lang-btn")];
+const musicCard = document.querySelector(".music-card");
+
+if (
+    musicCard &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+) {
+    function updateMusicCardTilt(event) {
+        const bounds = musicCard.getBoundingClientRect();
+        const horizontalPosition = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
+        const verticalPosition = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
+
+        musicCard.style.setProperty("--tilt-x", `${-verticalPosition * 1.25}deg`);
+        musicCard.style.setProperty("--tilt-y", `${horizontalPosition * 1.25}deg`);
+    }
+
+    musicCard.addEventListener("pointerenter", updateMusicCardTilt);
+    musicCard.addEventListener("pointermove", (event) => {
+        if (event.pointerType === "mouse") updateMusicCardTilt(event);
+    });
+    musicCard.addEventListener("pointerleave", () => {
+        musicCard.style.setProperty("--tilt-x", "0deg");
+        musicCard.style.setProperty("--tilt-y", "0deg");
+    });
+}
 
 function updateLanguageSlider(language) {
     const baseButton = languageButtons[0];
@@ -129,6 +164,8 @@ function setLanguage(language) {
         }
         if (typeof value === "string") updateText(element, value);
     });
+
+    document.querySelector("#music-player").title = translations[language].music.embedTitle;
 
     const currentProjectFallback = projectGrid.querySelector(".projects-state");
     if (currentProjectFallback && currentProjectFallback.dataset.langFallback) {
